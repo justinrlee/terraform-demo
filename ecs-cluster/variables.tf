@@ -10,7 +10,7 @@ variable "ecs_asg_name" {
 }
 
 variable "ami" {
-    default = "ami-0a9f5be2a016dccad"
+    default = "ami-02507631a9f7bc956"
 }
 
 variable "ecsInstanceRole" {
