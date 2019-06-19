@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-      bucket = "armory-dev-justin"
+      bucket = "armory-sales-justin"
       key = "terraform-demo/ecs-cluster"
       region = "us-east-1"
       profile = "terraform"
