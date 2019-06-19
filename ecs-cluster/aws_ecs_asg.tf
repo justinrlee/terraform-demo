@@ -12,13 +12,12 @@ resource "aws_security_group" "launch_template_securitygroup" {
   }
 }
 
-resource "aws_security_group_rule" "launch_template_securitygroup_from_alb" {
+resource "aws_security_group_rule" "launch_template_securitygroup_80" {
   type        = "ingress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = -1
-  # cidr_blocks = ["0.0.0.0/0"]
-  source_security_group_id = "${aws_security_group.armory_ecs_alb.id}"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 
   security_group_id = "${aws_security_group.launch_template_securitygroup.id}"
 }
