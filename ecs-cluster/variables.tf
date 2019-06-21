@@ -18,7 +18,7 @@ variable "ecsInstanceRole" {
 }
 
 variable "instance_count" {
-    default = null
+    default = 3
 }
 
 variable "ssh_key_name" {
