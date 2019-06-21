@@ -3,13 +3,13 @@ terraform {
       bucket = "armory-sales-justin"
       key = "terraform-demo/ecs-cluster"
       region = "us-east-1"
-      profile = "terraform"
+      profile = "armory-sales"
   }
 }
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "terraform"
+  profile = "armory-sales"
 }
 
 data "aws_region" "current" {}
