@@ -1,0 +1,172 @@
+{
+  "appConfig": {},
+  "expectedArtifacts": [],
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "anonymous",
+  "limitConcurrent": true,
+  "parallel": false,
+  "parameterConfig": [
+    {
+      "default": "helloworld",
+      "label": "Environment Name",
+      "name": "environment_name",
+      "required": true
+    }
+  ],
+  "stages": [
+    {
+      "action": "plan",
+      "artifacts": [
+        {
+          "reference": "https://github.com/justinrlee/terraform-demo",
+          "type": "git/repo"
+        }
+      ],
+      "backendArtifact": {
+        "artifactAccount": "github-for-terraform",
+        "reference": "https://api.github.com/repos/justinrlee/terraform-demo/contents/s3/backend.tfvars",
+        "type": "github/file"
+      },
+      "comments": "Plan Output: <br>\n<pre>${#stage('Plan')['outputs']['status']['logs']['plan_stdout']}</pre><br>\n<pre>${#stage('Plan')['outputs']['status']['logs']['plan_stderr']}</pre><br>",
+      "dir": "s3",
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {},
+          "id": "2d3519d9-040a-41ff-b258-a8a2fee7bf5f",
+          "matchArtifact": {
+            "name": "planfile",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false
+        }
+      ],
+      "name": "Plan",
+      "overrides": {
+        "environment_name": "${parameters.environment_name}"
+      },
+      "refId": "2",
+      "requisiteStageRefIds": [],
+      "terraformVersion": "0.12.8",
+      "type": "terraform"
+    },
+    {
+      "action": "apply",
+      "artifacts": [
+        {
+          "reference": "https://github.com/justinrlee/terraform-demo",
+          "type": "git/repo"
+        },
+        {
+          "name": "planfile",
+          "reference": "${#stage('Plan')['context']['artifacts'][0]['reference']}",
+          "type": "embedded/base64"
+        }
+      ],
+      "backendArtifact": {
+        "artifactAccount": "github-for-terraform",
+        "reference": "https://api.github.com/repos/justinrlee/terraform-demo/contents/s3/backend.tfvars",
+        "type": "github/file"
+      },
+      "comments": "Plan Output: <br>\n<pre>${#stage('Apply')['outputs']['status']['logs']['apply_stdout']}</pre><br>\n<pre>${#stage('Apply')['outputs']['status']['logs']['apply_stderr']}</pre><br>",
+      "dir": "s3",
+      "name": "Apply",
+      "overrides": {
+        "environment_name": "${parameters.environment_name}"
+      },
+      "refId": "4",
+      "requisiteStageRefIds": [
+        "12"
+      ],
+      "terraformVersion": "0.12.8",
+      "type": "terraform"
+    },
+    {
+      "action": "output",
+      "artifacts": [
+        {
+          "reference": "https://github.com/justinrlee/terraform-demo",
+          "type": "git/repo"
+        }
+      ],
+      "backendArtifact": {
+        "artifactAccount": "github-for-terraform",
+        "reference": "https://api.github.com/repos/justinrlee/terraform-demo/contents/s3/backend.tfvars",
+        "type": "github/file"
+      },
+      "comments": "Plan Output: <br>\n<pre>${#stage('Output')['outputs']['status']['logs']['output_stdout']}</pre><br>\n<pre>${#stage('Output')['outputs']['status']['logs']['output_stderr']}</pre><br>",
+      "dir": "s3",
+      "name": "Output",
+      "overrides": {
+        "environment_name": "${parameters.environment_name}"
+      },
+      "refId": "9",
+      "requisiteStageRefIds": [
+        "4"
+      ],
+      "terraformVersion": "0.12.8",
+      "type": "terraform"
+    },
+    {
+      "comments": "${#stage( 'Output' )[\"context\"][\"status\"][\"outputs\"][\"test_output\"][\"value\"]}",
+      "name": "Wait",
+      "refId": "10",
+      "requisiteStageRefIds": [
+        "9"
+      ],
+      "type": "wait",
+      "waitTime": 5
+    },
+    {
+      "account": "spinnaker",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "embedded-artifact",
+      "manifests": [
+        {
+          "apiVersion": "v1",
+          "data": {
+            "bucketArn": "${#stage( 'Output' )[\"context\"][\"status\"][\"outputs\"][\"test_output\"][\"value\"]}"
+          },
+          "kind": "ConfigMap",
+          "metadata": {
+            "name": "bucket-config",
+            "namespace": "spinnaker"
+          }
+        }
+      ],
+      "moniker": {
+        "app": "terraform"
+      },
+      "name": "Deploy Bucket ConfigMap",
+      "refId": "11",
+      "relationships": {
+        "loadBalancers": [],
+        "securityGroups": []
+      },
+      "requisiteStageRefIds": [
+        "10"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "text",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "failPipeline": true,
+      "judgmentInputs": [],
+      "name": "Manual Judgment",
+      "notifications": [],
+      "refId": "12",
+      "requisiteStageRefIds": [
+        "2"
+      ],
+      "type": "manualJudgment"
+    }
+  ],
+  "updateTs": "1577818972000"
+}
