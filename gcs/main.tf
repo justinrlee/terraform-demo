@@ -2,12 +2,12 @@ terraform {
   backend "gcs" {
       bucket = "justin-terraformer-gcs"
       prefix = "terraform-gcs-test"
-      credentials = "/home/spinnaker/credentials/gcloud.json"
+      credentials = "/Users/justin/Downloads/justin-terraformer-gcs.json"
   }
 }
 
 provider "google" {
-  credentials = file("/home/spinnaker/credentials/gcloud.json")
+  credentials = file("/Users/justin/Downloads/justin-terraformer-gcs.json")
   project = "cloud-armory"
   region = "us-central1"
   zone = "us-central1-c"
