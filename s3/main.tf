@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 variable "environment_name" {
-  default = "test"
+  default = "justin"
 }
 
 resource "aws_s3_bucket" "b" {
